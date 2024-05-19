@@ -51,3 +51,40 @@ bool binaryFiles::isEmpty(const std::string &nombreArchivo)
     }
     return archivo.tellg() == 0;
 }
+
+bool binaryFiles::deleteInFile(const char *nombreArchivo, const size_t size, int indice)
+{
+    std::vector<char> buffer;
+    std::ifstream archivo(nombreArchivo, std::ios::binary);
+    if (!archivo)
+    {
+        std::cerr << "NO SE PUDO ABRIR EL ARCHIVO." << std::endl;
+        return false;
+    }
+    archivo.seekg(0, std::ios::end);
+    size_t tamano = archivo.tellg();
+    archivo.seekg(0, std::ios::beg);
+    buffer.resize(tamano);
+    archivo.read(buffer.data(), tamano);
+    archivo.close();
+
+    size_t posicion = indice * size;
+    if (posicion + size > tamano)
+    {
+        std::cerr << "Indice fuera de rango." << std::endl;
+        return false;
+    }
+
+    buffer.erase(buffer.begin() + posicion, buffer.begin() + posicion + size);
+
+    std::ofstream archivoSalida(nombreArchivo, std::ios::binary | std::ios::trunc);
+    if (!archivoSalida)
+    {
+        std::cerr << "NO SE PUDO ABRIR EL ARCHIVO PARA ESCRIBIR." << std::endl;
+        return false;
+    }
+    archivoSalida.write(buffer.data(), buffer.size());
+    archivoSalida.close();
+
+    return true;
+}

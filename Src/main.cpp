@@ -12,39 +12,114 @@ void manejarIzquierda(cdllSemester::Materia *&acceso);
 void printArrows();
 void printTitle();
 void printTitleOption(int i);
-bool vacio = false;
+bool vacio = false, esperandoEntradaMenu = false, vuelta = false;
 HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
 
 int main()
 {
     COORD posicionEspecifica;
+    linkedList list;
     char menu;
+    linkedList::Nodo *puntoAcceso = nullptr;
+    for (int a = 1; a < 11; a++)
+    {
+        list.newNodo(puntoAcceso, a);
+    }
     do
     {
         system("cls");
         FlushConsoleInputBuffer(hStdin);
-        printTitle();
-        bool esperandoEntradaMenu = false;
+        printTitleOption(puntoAcceso->semestre);
+
         while (true)
         {
+            if (vuelta)
+            {
+                system("cls");
+                printTitleOption(puntoAcceso->semestre);
+                vuelta = false;
+            }
+
             if (!esperandoEntradaMenu)
             {
-                if (GetKeyState(VK_LEFT) & 0x8000)
-                {
-                }
                 if (GetKeyState(VK_RIGHT) & 0x8000)
                 {
+                    if (puntoAcceso->sig != nullptr)
+                    {
+                        puntoAcceso = puntoAcceso->sig;
+                        system("cls");
+                        printTitleOption(puntoAcceso->semestre);
+                    }
+                }
+                if (GetKeyState('Q') & 0x8000)
+                {
+                    list.backtToStart(puntoAcceso);
+                    system("cls");
+                    printTitleOption(puntoAcceso->semestre);
+                }
+                if (GetKeyState('S') & 0x8000)
+                {
+                    FlushConsoleInputBuffer(hStdin);
+                    system("cls");
+                    return 0;
+                }
+                if (GetKeyState('A') & 0x8000)
+                {
+                    FlushConsoleInputBuffer(hStdin);
+                    system("cls");
+                    if (puntoAcceso->semestre == 1)
+                    {
+                        mecanismoSemestral("../data/primerSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 2)
+                    {
+                        mecanismoSemestral("../data/segundoSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 3)
+                    {
+                        mecanismoSemestral("../data/tercerSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 4)
+                    {
+                        mecanismoSemestral("../data/cuartoSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 5)
+                    {
+                        mecanismoSemestral("../data/quintoSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 6)
+                    {
+                        mecanismoSemestral("../data/sextoSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 7)
+                    {
+                        mecanismoSemestral("../data/septimoSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 8)
+                    {
+                        mecanismoSemestral("../data/octavoSemestre.bin");
+                    }
+                    else if (puntoAcceso->semestre == 9)
+                    {
+                        mecanismoSemestral("../data/novenoSemestre.bin");
+                    }
+                    else
+                    {
+                        mecanismoSemestral("../data/decimoSemestre.bin");
+                    }
                 }
             }
+            Sleep(50);
         }
     } while (true);
-
-    // mecanismoSemestral("../data/primerSemestre.bin");
+    FlushConsoleInputBuffer(hStdin);
+    system("cls");
     return 0;
 }
 
 void mecanismoSemestral(const char *_archivo)
 {
+    esperandoEntradaMenu = true;
     cdllSemester::Materia *acceso = nullptr;
     cdllSemester semestre;
     char nombre[40], codigo[9], c, c1;
@@ -172,6 +247,7 @@ void mecanismoSemestral(const char *_archivo)
                     if (GetKeyState('D') & 0x8000)
                     {
                         semestre.deleteNodo(acceso);
+                        semestre.deleteNodoinFile(acceso, _archivo);
                         if (acceso == nullptr)
                         {
                             system("cls");
@@ -221,6 +297,8 @@ void mecanismoSemestral(const char *_archivo)
 
     FlushConsoleInputBuffer(hStdin);
     system("cls");
+    esperandoEntradaMenu = false;
+    vuelta = true;
     return;
 }
 
@@ -300,9 +378,9 @@ void manejarIzquierda(cdllSemester::Materia *&acceso)
 void printArrows()
 {
     COORD posicionEspecifica = {7, 28};
-    imprimirEnPosicion(posicionEspecifica, "<");
+    imprimirEnPosicion(posicionEspecifica, "<-");
     posicionEspecifica.X = 110;
-    imprimirEnPosicion(posicionEspecifica, ">");
+    imprimirEnPosicion(posicionEspecifica, "->");
 }
 
 void printTitle()
@@ -313,7 +391,8 @@ void printTitle()
 
 void printTitleOption(int i)
 {
-    COORD posicionEspecifica = {45, 25};
+    printTitle();
+    COORD posicionEspecifica = {51, 14};
     if (i == 1)
     {
         imprimirEnPosicion(posicionEspecifica, "PRIMER SEMESTRE");
@@ -354,4 +433,12 @@ void printTitleOption(int i)
     {
         imprimirEnPosicion(posicionEspecifica, "DECIMO SEMESTRE");
     }
+    posicionEspecifica = {70, 22};
+    imprimirEnPosicion(posicionEspecifica, "Presione A para ver la informacion correspondiente");
+    posicionEspecifica = {70, 24};
+    imprimirEnPosicion(posicionEspecifica, "Presione Q para volver al inicio de la lista");
+    posicionEspecifica = {70, 26};
+    imprimirEnPosicion(posicionEspecifica, "Presione S para terminar la ejecucion\n\n");
+    posicionEspecifica = {110, 28};
+    imprimirEnPosicion(posicionEspecifica, "->");
 }

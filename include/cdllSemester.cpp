@@ -99,6 +99,7 @@ void cdllSemester::deleteNodoinFile(Materia *&acceso, const char *nombre_archivo
 {
     binaryFiles file;
     Saved auxiliar;
+    int indice = 0;
     int size = static_cast<int>(file.getSize(nombre_archivo, sizeof(Saved)));
     if (file.isEmpty(nombre_archivo))
     {
@@ -107,5 +108,11 @@ void cdllSemester::deleteNodoinFile(Materia *&acceso, const char *nombre_archivo
     for (int i = 0; i < size; i++)
     {
         file.read(nombre_archivo, sizeof(Saved), i, &auxiliar);
+        if (auxiliar.info.codigo == acceso->info.codigo)
+        {
+            indice = i;
+            break;
+        }
     }
+    file.deleteInFile(nombre_archivo, sizeof(Saved), indice);
 }
